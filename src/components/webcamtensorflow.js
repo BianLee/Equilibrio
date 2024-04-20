@@ -1,82 +1,92 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useEffect, useRef } from "react";
 import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
 
-function WebcamTensorFlow() {
-  console.log("hello");
+export default function WebcamTensorFlow() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
-  const runPosenet = async () => {
-    const net = await posenet.load();
-    console.log("PoseNet Model Loaded.");
+  useEffect(() => {
+    async function setupCamera() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error(
+          "Browser API navigator.mediaDevices.getUserMedia not available"
+        );
+      }
 
-    setInterval(() => {
-      detect(net);
-    }, 100);
-  };
-
-  const detect = async (net) => {
-    if (
-      typeof videoRef.current !== "undefined" &&
-      videoRef.current !== null &&
-      videoRef.current.readyState === 4
-    ) {
       const video = videoRef.current;
-      const videoWidth = video.videoWidth;
-      const videoHeight = video.videoHeight;
+      video.width = 640;
+      video.height = 480;
+      video.srcObject = await navigator.mediaDevices.getUserMedia({
+        video: true,
+      });
 
-      video.width = videoWidth;
-      video.height = videoHeight;
+      return new Promise((resolve) => {
+        video.onloadedmetadata = () => {
+          resolve(video);
+        };
+      });
+    }
 
+    async function loadPosenet() {
+      const net = await posenet.load();
+      console.log("PoseNet model loaded.");
+      return net;
+    }
+
+    async function detectPoseInRealTime(video, net) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d");
-      canvas.width = videoWidth;
-      canvas.height = videoHeight;
 
-      const pose = await net.estimateSinglePose(video, {
-        flipHorizontal: false,
-      });
-      drawCanvas(pose, video, ctx);
-    }
-  };
+      canvas.width = 640;
+      canvas.height = 480;
 
-  const drawCanvas = (pose, video, ctx) => {
-    ctx.drawImage(video, 0, 0);
-    // Draw keypoints and skeleton
-    pose.keypoints.forEach((keypoint) => {
-      if (keypoint.score > 0.5) {
-        const { y, x } = keypoint.position;
-        ctx.beginPath();
-        ctx.arc(x, y, 5, 0, 2 * Math.PI);
-        ctx.fillStyle = "Red";
-        ctx.fill();
+      async function poseDetectionFrame() {
+        const pose = await net.estimateSinglePose(video, {
+          flipHorizontal: false,
+        });
+
+        drawCanvas(pose, video, canvas, ctx);
+        requestAnimationFrame(poseDetectionFrame);
       }
-    });
-  };
 
-  useEffect(() => {
-    runPosenet();
+      poseDetectionFrame();
+    }
+
+    function drawCanvas(pose, video, canvas, ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      drawKeypoints(pose.keypoints, 0.6, ctx);
+      ctx.restore();
+    }
+
+    function drawKeypoints(keypoints, minConfidence, ctx) {
+      keypoints.forEach((keypoint) => {
+        if (keypoint.score >= minConfidence) {
+          const { y, x } = keypoint.position;
+          ctx.beginPath();
+          ctx.arc(x, y, 3, 0, 2 * Math.PI);
+          ctx.fillStyle = "aqua";
+          ctx.fill();
+        }
+      });
+    }
+
+    setupCamera().then((video) => {
+      video.play();
+      loadPosenet().then((net) => {
+        detectPoseInRealTime(video, net);
+      });
+    });
   }, []);
 
   return (
     <div>
-      <video
-        ref={videoRef}
-        playsInline
-        autoPlay
-        muted
-        width="640"
-        height="480"
-      />
-      <canvas
-        ref={canvasRef}
-        style={{ position: "absolute", top: 0, left: 0 }}
-      />
+      <video ref={videoRef} style={{ display: "none" }} />
+      <canvas ref={canvasRef} />
     </div>
   );
 }
-
-export default WebcamTensorFlow;
