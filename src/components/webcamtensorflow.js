@@ -46,10 +46,15 @@ export default function WebcamTensorFlow() {
         const static_pose = await net.estimateSinglePose(video, {
           flipHorizontal: false,
         });
-        const relative_pose = centralizePoints(JSON.parse(JSON.stringify(static_pose)));
+        const relative_pose = centralizePoints(JSON.parse(JSON.stringify(static_pose)));  // deep copies the static_pose and makes coordinates relative
         setPose(relative_pose); // Update the pose state with the latest pose
 
-        drawCanvas(static_pose, video, canvas, ctx);
+        if (shoulderInFrame(static_pose)) {
+          drawCanvas(static_pose, video, canvas, ctx);
+        } else {
+          errorCanvas(video, canvas, ctx);
+        }
+        
         requestAnimationFrame(poseDetectionFrame);
       }
       poseDetectionFrame();
@@ -67,7 +72,17 @@ export default function WebcamTensorFlow() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    drawKeypoints(pose.keypoints, 0.6, ctx);
+    drawKeypoints(pose.keypoints, 0.6, ctx);  // 0.6 is the minimum confidence required per body point for it to be displayed
+    ctx.restore();
+  }
+
+  function errorCanvas(video, canvas, ctx) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 10;
+    ctx.strokeRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
   }
 
