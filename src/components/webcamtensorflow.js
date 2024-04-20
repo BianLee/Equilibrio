@@ -5,6 +5,8 @@ import { centralizePoints, shoulderInFrame } from "./relativePosition.js";
 import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
 
+const MIN_CONFIDENCE = 0.6;
+
 export default function WebcamTensorFlow() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -46,11 +48,12 @@ export default function WebcamTensorFlow() {
         const static_pose = await net.estimateSinglePose(video, {
           flipHorizontal: false,
         });
-        const relative_pose = centralizePoints(JSON.parse(JSON.stringify(static_pose)));  // deep copies the static_pose and makes coordinates relative
-        setPose(relative_pose); // Update the pose state with the latest pose
-
-        if (shoulderInFrame(static_pose)) {
+        
+        if (shoulderInFrame(static_pose, MIN_CONFIDENCE)) {
+          const relative_pose = centralizePoints(JSON.parse(JSON.stringify(static_pose)));  // deep copies the static_pose and makes coordinates relative
+          setPose(relative_pose); // Update the pose state with the latest pose
           drawCanvas(static_pose, video, canvas, ctx);
+          
         } else {
           errorCanvas(video, canvas, ctx);
         }
@@ -72,7 +75,7 @@ export default function WebcamTensorFlow() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    drawKeypoints(pose.keypoints, 0.6, ctx);  // 0.6 is the minimum confidence required per body point for it to be displayed
+    drawKeypoints(pose.keypoints, ctx);  // 0.6 is the minimum confidence required per body point for it to be displayed
     ctx.restore();
   }
 
@@ -83,12 +86,15 @@ export default function WebcamTensorFlow() {
     ctx.strokeStyle = "red";
     ctx.lineWidth = 10;
     ctx.strokeRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "red";
+    ctx.font = "24px sans-serif";
+    ctx.fillText("Please keep both shoulders in frame.", 10, 34);
     ctx.restore();
   }
 
-  function drawKeypoints(keypoints, minConfidence, ctx) {
+  function drawKeypoints(keypoints, ctx) {
     keypoints.forEach((keypoint) => {
-      if (keypoint.score >= minConfidence) {
+      if (keypoint.score >= MIN_CONFIDENCE) {
         const { y, x } = keypoint.position;
         ctx.beginPath();
         ctx.arc(x, y, 3, 0, 2 * Math.PI);
