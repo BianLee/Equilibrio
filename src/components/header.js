@@ -5,8 +5,8 @@ import { Dialog } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 
 const navigation = [
-  { name: "A", href: "#" },
-  { name: "B", href: "#" },
+  { name: "Account", href: "#" },
+  { name: "Upload", href: "#" },
   { name: "C", href: "#" },
   { name: "D", href: "#" },
 ];
@@ -23,6 +23,7 @@ export default function Example() {
         <div className="flex lg:flex-1">
           <a href="#" className="-m-1.5 p-1.5">
             <span className="sr-only">Your Company</span>
+            <h1>LA Hacks</h1>
           </a>
         </div>
         <div className="flex lg:hidden">
