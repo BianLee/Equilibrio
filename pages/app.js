@@ -1,17 +1,11 @@
 "use client";
-import dynamic from "next/dynamic";
 
-const WebcamTensorFlow = dynamic(
-  () => import("../components/webcamtensorflow"),
-  { ssr: false } // This disables server-side rendering for this component
-);
-
-// import WebcamTensorFlow from "../components/webcamtensorflow";
-import useInitializeAuth from "../hooks/authHook";
+import WebcamTensorFlow from "../src/components/webcamtensorflow";
+import useInitializeAuth from "../src/hooks/authHook";
 import { useRouter } from "next/navigation";
 
-import useAuthStore from "../../stores/authStore";
-import { supabase } from "../../src/utils/supabaseClient";
+import useAuthStore from "../stores/authStore";
+import { supabase } from "../src/utils/supabaseClient";
 
 export default function Home() {
   useInitializeAuth();
