@@ -14,11 +14,11 @@ export default function Home() {
     isAuthenticated: state.isAuthenticated,
     setAuth: state.setAuth,
   }));
-  const handleLogin = () => {
+  const handleLogin = () => {  
     router.push("/signin");
   };
 
-  const signOutUser = async () => {
+  const signOutUser = async () => {  
     const { error } = await supabase.auth.signOut();
     if (!error) {
       setAuth(null);
@@ -30,12 +30,12 @@ export default function Home() {
   return (
     <>
       {" "}
-      {!isAuthenticated && (
+      {!isAuthenticated && (  // if user is not authenticated, display login button
         <button type="button" onClick={handleLogin}>
           Login
         </button>
       )}
-      {isAuthenticated && (
+      {isAuthenticated && (  // if user is authenticated, display log out button
         <button type="button" onClick={signOutUser}>
           Log Out
         </button>

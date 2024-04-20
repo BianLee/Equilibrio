@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { centralizePoints, shoulderInFrame } from "./relativePosition.js";
 import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
 
@@ -30,7 +31,7 @@ export default function WebcamTensorFlow() {
     }
 
     async function loadPosenet() {
-      const net = await posenet.load();
+      const net = await posenet.load();  // returns posenet.PoseNet object
       return net;
     }
 
@@ -41,11 +42,14 @@ export default function WebcamTensorFlow() {
       canvas.height = 480;
 
       async function poseDetectionFrame() {
-        const pose = await net.estimateSinglePose(video, {
+        // uses the loaded PoseNet object (#33) 
+        const static_pose = await net.estimateSinglePose(video, {
           flipHorizontal: false,
         });
-        setPose(pose); // Update the pose state with the latest pose
-        drawCanvas(pose, video, canvas, ctx);
+        const relative_pose = centralizePoints(JSON.parse(JSON.stringify(static_pose)));
+        setPose(relative_pose); // Update the pose state with the latest pose
+
+        drawCanvas(static_pose, video, canvas, ctx);
         requestAnimationFrame(poseDetectionFrame);
       }
       poseDetectionFrame();
