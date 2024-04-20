@@ -24,10 +24,6 @@ export default function AuthComponent() {
     setPhoneValid(validatePhoneNumber(value)); // Validate and update validity state
   };
 
-  const isValidUcDavisEmail = (email) => {
-    return email.endsWith("@ucdavis.edu");
-  };
-
   const routeToSignIn = () => {
     router.push("/signin");
   };
@@ -37,11 +33,6 @@ export default function AuthComponent() {
     setError(null);
 
     // Check if the email is a valid UC Davis email before attempting to sign up
-    if (!isValidUcDavisEmail(email)) {
-      setError("Please use a UC Davis email address (@ucdavis.edu).");
-      setLoading(false);
-      return;
-    }
 
     const { user, error: signUpError } = await supabase.auth.signUp({
       email: email,
@@ -161,8 +152,6 @@ export default function AuthComponent() {
             >
               Sign In
             </span>
-            <br />
-            Please note that only ucdavis.edu emails are accepted.
           </p>
         </div>
       </div>
