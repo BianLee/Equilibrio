@@ -7,7 +7,7 @@ import * as posenet from "@tensorflow-models/posenet";
 export default function WebcamTensorFlow() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const [poses, setPoses] = useState([]); // State to store poses
+  const [pose, setPose] = useState(null); // State to store the current pose
 
   useEffect(() => {
     async function setupCamera() {
@@ -44,15 +44,11 @@ export default function WebcamTensorFlow() {
         const pose = await net.estimateSinglePose(video, {
           flipHorizontal: false,
         });
+        setPose(pose); // Update the pose state with the latest pose
         drawCanvas(pose, video, canvas, ctx);
-        updatePoses(pose); // Update the poses state
         requestAnimationFrame(poseDetectionFrame);
       }
       poseDetectionFrame();
-    }
-
-    function updatePoses(pose) {
-      setPoses((prevPoses) => [...prevPoses, pose]);
     }
 
     setupCamera().then((video) => {
@@ -87,50 +83,29 @@ export default function WebcamTensorFlow() {
     <div>
       <video ref={videoRef} style={{ display: "none" }} />
       <canvas ref={canvasRef} />
-      <PoseTable poses={poses} />
+      {pose && <PoseTable pose={pose} />}
     </div>
   );
 }
 
-function PoseTable({ poses }) {
+function PoseTable({ pose }) {
   return (
     <table>
       <thead>
         <tr>
-          <th>Frame</th>
-          <th>Person</th>
+          <th>Part</th>
           <th>Score</th>
-          <th>Nose Score</th>
-          <th>Nose X</th>
-          <th>Nose Y</th>
-          <th>Left Eye Score</th>
-          <th>Left Eye X</th>
-          <th>Left Eye Y</th>
-          <th>Left Ankle Score</th>
-          <th>Left Ankle X</th>
-          <th>Left Ankle Y</th>
-          <th>Right Ankle Score</th>
-          <th>Right Ankle X</th>
-          <th>Right Ankle Y</th>
+          <th>X</th>
+          <th>Y</th>
         </tr>
       </thead>
       <tbody>
-        {poses.map((pose, index) => (
+        {pose.keypoints.map((keypoint, index) => (
           <tr key={index}>
-            <td>{index + 1}</td>
-            <td>1</td> {/* Assuming one person for simplicity */}
-            <td>{pose.score.toFixed(2)}</td>
-            {pose.keypoints
-              .filter((kp) =>
-                ["nose", "leftEye", "leftAnkle", "rightAnkle"].includes(kp.part)
-              )
-              .map((kp) => (
-                <>
-                  <td>{kp.score.toFixed(2)}</td>
-                  <td>{kp.position.x.toFixed(2)}</td>
-                  <td>{kp.position.y.toFixed(2)}</td>
-                </>
-              ))}
+            <td>{keypoint.part}</td>
+            <td>{keypoint.score.toFixed(2)}</td>
+            <td>{keypoint.position.x.toFixed(2)}</td>
+            <td>{keypoint.position.y.toFixed(2)}</td>
           </tr>
         ))}
       </tbody>
