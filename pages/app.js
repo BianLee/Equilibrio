@@ -34,16 +34,22 @@ export default function Home() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-100">
-      <nav className="px-4 py-4 flex justify-between items-center">
-      <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">equilibr.io</h1>
+    <div className="min-h-screen bg-gray-100">
+    <nav className="flex items-center justify-center py-4">
+      <div className="absolute left-4">
         <button
-          className="bg-gray-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={isAuthenticated ? signOutUser : handleLogin}
+         className="bg-gray-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+         onClick={isAuthenticated ? signOutUser : handleLogin}
         >
-          {isAuthenticated ? 'Log Out' : 'Login'}
+        {isAuthenticated ? 'Log Out' : 'Login'}
         </button>
-      </nav>
+      </div>
+      <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">equilibr.io</h1>
+      <div className="absolute right-4">
+        {/* spacer */}
+        <div className="w-24" aria-hidden="true"></div>
+      </div>
+    </nav>
 
       <div className="px-4 py-2">
         <div className="flex -mx-2">
