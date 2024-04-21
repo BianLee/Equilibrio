@@ -197,7 +197,7 @@ export default function WebcamTensorFlow() {
         <label className="flex items-center space-x-2">
           <input
             type="radio"
-            value="Chair"
+            value="chair"
             checked={selectedPosition === "chair"}
             onChange={handlePositionChange}
             className="text-indigo-600 focus:ring-indigo-500 border-gray-300"
@@ -207,7 +207,7 @@ export default function WebcamTensorFlow() {
         <label className="flex items-center space-x-2">
           <input
             type="radio"
-            value="Tree"
+            value="tree"
             checked={selectedPosition === "tree"}
             onChange={handlePositionChange}
             className="text-green-600 focus:ring-green-500 border-gray-300"
@@ -217,7 +217,7 @@ export default function WebcamTensorFlow() {
         <label className="flex items-center space-x-2">
           <input
             type="radio"
-            value="Dog"
+            value="dog"
             checked={selectedPosition === "dog"}
             onChange={handlePositionChange}
             className="text-blue-600 focus:ring-blue-500 border-gray-300"
@@ -225,10 +225,10 @@ export default function WebcamTensorFlow() {
           <span className="text-gray-700">Dog</span>
         </label>
       </div>
-      {/* pose && <PoseTable pose={pose} /> */}
       <div>
         <h3>Coach: {advice.current}</h3>
       </div>
+      {pose && <PoseTable pose={pose} />}
     </div>
   );
 }
