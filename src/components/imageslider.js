@@ -18,7 +18,7 @@ function ImageSlider() {
       <Slider {...settings}>
         <div>
           <img
-            src="./cobra.jpg"
+            src="./cobra.png"
             alt="Image 1"
             style={{ userSelect: "none", pointerEvents: "none" }}
             draggable="false"
@@ -26,7 +26,7 @@ function ImageSlider() {
         </div>
         <div>
           <img
-            src="dog.jpg"
+            src="dog.png"
             alt="Image 2"
             style={{ userSelect: "none", pointerEvents: "none" }}
             draggable="false"
