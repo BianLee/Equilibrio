@@ -1,6 +1,8 @@
 "use client";
 import "../src/app/globals.css";
 import dynamic from "next/dynamic";
+import Link from 'next/link';
+
 const WebcamTensorFlow = dynamic(
   () => import("../src/components/webcamtensorflow"),
   { ssr: false } // This disables server-side rendering for this component
@@ -35,29 +37,25 @@ export default function Home() {
   return (
     <>
     <div className="min-h-screen bg-gray-100">
-    <nav className="flex items-center justify-center py-4">
-      <div className="absolute left-4">
+
+      <nav className="relative flex items-center justify-center py-4">
+        <Link href="/">
+          <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">equilibr.io</h1>
+        </Link>
         <button
-         className="bg-gray-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-         onClick={isAuthenticated ? signOutUser : handleLogin}
-        >
-        {isAuthenticated ? 'Log Out' : 'Login'}
+          className="absolute right-4 bg-gray-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={isAuthenticated ? signOutUser : handleLogin}>
+          {isAuthenticated ? 'Log Out' : 'Login'}
         </button>
-      </div>
-      <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">equilibr.io</h1>
-      <div className="absolute right-4">
-        {/* spacer */}
-        <div className="w-24" aria-hidden="true"></div>
-      </div>
-    </nav>
+      </nav>
 
       <div className="px-4 py-2">
         <div className="flex -mx-2">
           <div className="w-1/2 px-2">
             <div className="bg-white p-4 rounded-lg shadow">
-              <p className="mt-2 text-gray-800 text-sm">
-                Feedback: 
-              </p>
+                <p className="mt-2 text-gray-800 text-sm">
+                  Feedback: 
+                </p>
                {/* feedback */}
                <div className="flex justify-center">
                 <WebcamTensorFlow />
