@@ -12,6 +12,10 @@ const MODEL_NAME = "gemini-pro";
 const API_KEY = process.env.NEXT_PUBLIC_API;
 const instructions = "";
 import React, { useState, useEffect } from "react";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import ImageSlider from "../src/components/imageslider"; // Assuming ImageSlider is in the same directory
 
 const WebcamTensorFlow = dynamic(
   () => import("../src/components/webcamtensorflow"),
@@ -267,6 +271,9 @@ export default function Home() {
                     Your browser does not support the audio element.
                   </audio>
                 )}
+              </div>
+              <div className="bg-white p-4 mt-4 rounded-lg shadow h-auto flex flex-col">
+                <ImageSlider />
               </div>
             </div>
           </div>

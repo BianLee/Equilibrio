@@ -31,6 +31,7 @@ export default function WebcamTensorFlow() {
   const EF = useRef(null);  // elbows flared boolean
 
   const current_pose = useRef(null);
+  const advice = useRef(null);
 
   useEffect(() => {
     async function setupCamera() {
@@ -77,16 +78,18 @@ export default function WebcamTensorFlow() {
           TP.current = treePose(relative_pose, MIN_CONFIDENCE);
           EF.current = elbowsFlared(relative_pose, MIN_CONFIDENCE);
 
-          if (HAH.current && KT.current && AS.current) {
-            current_pose.current = "chair";
-          } else if (OAF.current && LH.current) {
-            current_pose.current = "dog";
-          } else if (TP.current && !OAF.current && EF.current) {
-            current_pose.current = "tree";
-          } else {
-            current_pose.current = "Freestyle Yoga Pose!";
-          }
-          printFeedback(current_pose.current)
+          // if (HAH.current && KT.current && AS.current) {
+          //   current_pose.current = "chair";
+          // } else if (OAF.current && LH.current) {
+          //   current_pose.current = "dog";
+          // } else if (TP.current && !OAF.current && EF.current) {
+          //   current_pose.current = "tree";
+          // } else {
+          //   current_pose.current = "Freestyle Yoga Pose!";
+          // }
+
+          // use selection to swap out 'current_pose.current'
+          advice.current = printFeedback(static_pose, video, canvas, ctx, current_pose.current);
           setPose(relative_pose); // Update the pose state with the latest pose
           drawCanvas(static_pose, video, canvas, ctx);
         } else {
@@ -136,6 +139,17 @@ export default function WebcamTensorFlow() {
     ctx.restore();
   }
 
+  function successCanvas(pose, video, canvas, ctx) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    drawKeypoints(pose.keypoints, ctx);
+    ctx.strokeStyle = "green";
+    ctx.lineWidth = 15;
+    ctx.strokeRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  }
+
   function drawKeypoints(keypoints, ctx) {
     keypoints.forEach((keypoint) => {
       if (keypoint.score >= MIN_CONFIDENCE) {
@@ -148,26 +162,35 @@ export default function WebcamTensorFlow() {
     });
   }
 
-  function printFeedback(pose) {
+  function printFeedback(pose_points, video, canvas, ctx, pose) {
     if (pose === 'chair') {
       if (!HAH) {
-        return 'raise arms higher!';
+        return 'Try to raise arms higher!';
       } else if (!KT) {
-        return 'put your knees together!';
+        return 'Try to put your knees together!';
       } else if (!AS) {
-        return 'straighten your arms!';
+        return 'Try to straighten your arms!';
+      } else {
+        successCanvas(pose_points, video, canvas, ctx);
+        return 'Yes, good job!';
       }
     } else if (pose === 'dog') {
       if (!OAF) {
-        return 'get on all fours!';
+        return 'Try to get on all fours!';
       } else if (!HLS) {
-        return 'lower your head!';
+        return 'Try to lower your head!';
+      } else {
+        successCanvas(pose_points, video, canvas, ctx);
+        return 'Yes, good job!';
       }
     } else if (pose === 'tree') {
       if (!TP) {
-        return 'raise your leg up!';
+        return 'Try to raise your leg up!';
       } else if (!EF) {
-        return 'flare our elbows!';
+        return 'Try to flare our elbows!';
+      } else {
+        successCanvas(pose_points, video, canvas, ctx);
+        return 'Yes, good job!';
       }
     }
   }
@@ -178,14 +201,14 @@ export default function WebcamTensorFlow() {
       <canvas ref={canvasRef} />
       <div>
         <h1>You are performing a {String(current_pose.current)}</h1>
-        <h2>Try to {printFeedback(current_pose.current)}</h2>
-        <h2>hands above head: {String(HAH.current)}</h2>
-        <h2>knees together: {String(KT.current)}</h2>
-        <h2>arms straight: {String(AS.current)}</h2>
-        <h2>on all fours: {String(OAF.current)}</h2>
-        <h2>lower head: {String(LH.current)}</h2>
-        <h2>tree pose: {String(TP.current)}</h2>
-        <h2>elbows flared: {String(EF.current)}</h2>
+        <h2>{advice}</h2>
+        <h3>hands above head: {String(HAH.current)}</h3>
+        <h3>knees together: {String(KT.current)}</h3>
+        <h3>arms straight: {String(AS.current)}</h3>
+        <h3>on all fours: {String(OAF.current)}</h3>
+        <h3>lower head: {String(LH.current)}</h3>
+        <h3>tree pose: {String(TP.current)}</h3>
+        <h3>elbows flared: {String(EF.current)}</h3>
       </div>
       <div>Current Time: {new Date().toLocaleString()}</div>
       {pose && <PoseTable pose={pose} />}
