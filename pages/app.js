@@ -2,7 +2,9 @@
 import "../src/app/globals.css";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import React, { useState } from "react";
+import axios from "axios";
+
+import React, { useState, useEffect } from "react";
 
 const WebcamTensorFlow = dynamic(
   () => import("../src/components/webcamtensorflow"),
@@ -29,6 +31,40 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
 
+  const [audioUrl, setAudioUrl] = useState("");
+
+  const handleAudioGeneration = async (message) => {
+    // Set the API key for ElevenLabs API.
+    // Do not use directly. Use environment variables.
+    const API_KEY = "6ec6a451d2ee80120d295ed14bd80e10";
+    // Set the ID of the voice to be used.
+    const VOICE_ID = "5BtoxJWuomqxGLNvKwal";
+
+    // Set options for the API request.
+    const options = {
+      method: "POST",
+      url: `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
+      headers: {
+        accept: "audio/mpeg", // Set the expected response type to audio/mpeg.
+        "content-type": "application/json", // Set the content type to application/json.
+        "xi-api-key": `${API_KEY}`, // Set the API key in the headers.
+      },
+      data: {
+        text: message || "hello", // Pass in the inputText as the text to be converted to speech.
+      },
+      responseType: "arraybuffer", // Set the responseType to arraybuffer to receive binary data as response.
+    };
+
+    try {
+      const response = await axios.request(options);
+      const audioBlob = new Blob([response.data], { type: "audio/mpeg" });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      setAudioUrl(audioUrl);
+    } catch (error) {
+      console.error("Error generating audio:", error);
+    }
+  };
+
   const handleInputChange = (event) => {
     setMessage(event.target.value);
   };
@@ -49,6 +85,10 @@ export default function Home() {
     }
   };
 
+  // Use the useEffect hook to call the handleAudioFetch function once when the component mounts
+  useEffect(() => {
+    handleAudioGeneration();
+  }, []);
   return (
     <>
       <div className="min-h-screen bg-gray-100">
@@ -94,6 +134,20 @@ export default function Home() {
                     onChange={handleInputChange}
                     onKeyPress={handleKeyPress}
                   />
+                </div>
+                <div className="w-1/2 px-2">
+                  {/* Existing Message Box Code */}
+                  <button
+                    onClick={() => handleAudioGeneration(message)}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  >
+                    Generate Audio
+                  </button>
+                  {audioUrl && (
+                    <audio controls src={audioUrl} className="mt-4">
+                      Your browser does not support the audio element.
+                    </audio>
+                  )}
                 </div>
               </div>
             </div>
