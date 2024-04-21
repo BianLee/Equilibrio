@@ -37,7 +37,7 @@ export default function Home() {
       temperature: 0.9,
       topK: 1,
       topP: 1,
-      maxOutputTokens: 2048,
+      maxOutputTokens: 400,
     };
 
     const safetySettings = [
