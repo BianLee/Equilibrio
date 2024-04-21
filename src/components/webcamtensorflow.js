@@ -1,16 +1,16 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import { centralizePoints, shoulderInFrame } from "./relativePosition.js";
 import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
 
 const MIN_CONFIDENCE = 0.6;
+const SNAPSHOT_INTERVAL = 10000; // milliseconds (10 seconds)
 
 export default function WebcamTensorFlow() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const [pose, setPose] = useState(null); // State to store the current pose
+  const [pose, setPose] = useState(null);
+  const [lastSnapshotTime, setLastSnapshotTime] = useState(Date.now());
 
   useEffect(() => {
     async function setupCamera() {
@@ -33,7 +33,7 @@ export default function WebcamTensorFlow() {
     }
 
     async function loadPosenet() {
-      const net = await posenet.load();  // returns posenet.PoseNet object
+      const net = await posenet.load();
       return net;
     }
 
@@ -44,20 +44,27 @@ export default function WebcamTensorFlow() {
       canvas.height = 480;
 
       async function poseDetectionFrame() {
-        // uses the loaded PoseNet object (#33) 
         const static_pose = await net.estimateSinglePose(video, {
           flipHorizontal: false,
         });
-        
+
         if (shoulderInFrame(static_pose, MIN_CONFIDENCE)) {
-          const relative_pose = centralizePoints(JSON.parse(JSON.stringify(static_pose)));  // deep copies the static_pose and makes coordinates relative
-          setPose(relative_pose); // Update the pose state with the latest pose
+          const relative_pose = centralizePoints(
+            JSON.parse(JSON.stringify(static_pose))
+          );
+
+          setPose(relative_pose);
           drawCanvas(static_pose, video, canvas, ctx);
-          
+
+          const currentTime = Date.now();
+          if (currentTime - lastSnapshotTime >= SNAPSHOT_INTERVAL) {
+            logPose(relative_pose);
+            setLastSnapshotTime(currentTime);
+          }
         } else {
           errorCanvas(video, canvas, ctx);
         }
-        
+
         requestAnimationFrame(poseDetectionFrame);
       }
       poseDetectionFrame();
@@ -71,11 +78,20 @@ export default function WebcamTensorFlow() {
     });
   }, []);
 
+  function logPose(pose) {
+    console.log(
+      "Snapshot at:",
+      new Date(lastSnapshotTime).toISOString(),
+      "Pose data:",
+      pose
+    );
+  }
+
   function drawCanvas(pose, video, canvas, ctx) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    drawKeypoints(pose.keypoints, ctx);  // 0.6 is the minimum confidence required per body point for it to be displayed
+    drawKeypoints(pose.keypoints, ctx);
     ctx.restore();
   }
 
@@ -108,6 +124,7 @@ export default function WebcamTensorFlow() {
     <div>
       <video ref={videoRef} style={{ display: "none" }} />
       <canvas ref={canvasRef} />
+      <div>Current Time: {new Date(lastSnapshotTime).toLocaleString()}</div>
       {pose && <PoseTable pose={pose} />}
     </div>
   );
