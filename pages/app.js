@@ -215,19 +215,27 @@ export default function Home() {
               </div>
             </div>
             <div className="w-1/2 px-2">
-              <div className="bg-white p-4 rounded-lg shadow h-full flex flex-col">
+              <div className="bg-white p-4 rounded-lg shadow h-auto flex flex-col">
+                <p>
+                  Personal Coach: Gemini-powered AI coach with ElevenLabs
+                  integration
+                </p>
                 <div className="flex-1 overflow-y-auto">
                   {messages.map((msg, index) => (
                     <div
                       key={index}
-                      className={`p-2 m-2 rounded ${
-                        msg.sender === "user" ? "bg-blue-100" : "bg-gray-100"
+                      className={`mx-4 my-1 p-2 rounded-sm max-w-md ${
+                        msg.sender === "user"
+                          ? "bg-blue-100 ml-auto p-2"
+                          : "bg-gray-100 mr-auto p-2"
                       }`}
+                      style={{ borderRadius: "20px" }}
                     >
                       {msg.text}
                     </div>
                   ))}
                 </div>
+
                 <div className="mt-4">
                   <input
                     type="text"
@@ -242,7 +250,7 @@ export default function Home() {
                 </div>
                 <button
                   onClick={() => handleAudioGeneration(message)}
-                  className="..."
+                  className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-2"
                 >
                   Send
                 </button>

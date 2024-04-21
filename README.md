@@ -5,7 +5,7 @@ The recent surge in remote and home workouts has not only shaped the market but 
 
 
 ## What it does
-Welcome to Equilibr.io, your ultimate companion for mastering the art of yoga and pilates. Our innovative web app revolutionizes your practice by offering real-time form correction and live, personalized coaching, transforming home workouts into professional-level sessions, ensuring you perform every pose safely and effectively. Whether you're a beginner looking to learn the basics or an advanced practitioner aiming to perfect your technique, our app adapts to meet your needs.
+Welcome to Equilibrio, your ultimate companion for mastering the art of yoga and pilates. Our innovative web app revolutionizes your practice by offering real-time form correction and live, personalized coaching, transforming home workouts into professional-level sessions, ensuring you perform every pose safely and effectively. Whether you're a beginner looking to learn the basics or an advanced practitioner aiming to perfect your technique, our app adapts to meet your needs.
 
 With Equilibrio, you're never practicing alone. We also provide a live chat feature that connects you directly with a knowledgeable AI agent that provides personalized workout routines and advice tailored just for you. This one-on-one guidance helps you make the most out of your practice, avoid injuries, and achieve your fitness goals faster.
 
@@ -18,6 +18,7 @@ Our chatbot feature also uses LLMs, specifically the Google Gemini API, to provi
 We also implemented a text-to-speech feature in our chat using ElevenLabs, so that users can hear their feedback live while they are doing their exercises, instead of having to input information on their device. 
 
 ![Our tools and frameworks](https://i.imgur.com/915cUSg.png)
+
 
 ## Challenges we ran into
 As none of our team members has had extensive experience working with ML/AI, we found it difficult to start on the central process of our app, the live motion feedback. The most difficult process of our entire coding process was integrating the trained machine learning models with our frontend. We ran into several errors along the way, including timed out API call requests, faulty or missing training data, and overall difficulty with implementing the backend. 
