@@ -10,7 +10,7 @@ import {
 } from "@google/generative-ai";
 const MODEL_NAME = "gemini-pro";
 const API_KEY = process.env.NEXT_PUBLIC_API;
-const instructions = "";
+const instructions = "keep the response under 70 words";
 import React, { useState, useEffect } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
