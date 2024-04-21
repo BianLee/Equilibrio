@@ -21,14 +21,15 @@ export default function WebcamTensorFlow() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [pose, setPose] = useState(null); // State to store the current pose
+  const [selectedPosition, setSelectedPosition] = useState("");
 
   const HAH = useRef(null); // hands above head boolean
   const KT = useRef(null); // knees together boolean
-  const AS = useRef(null);  // arms straight boolean
-  const OAF = useRef(null);  // on all fours boolean
-  const LH = useRef(null);  // lower head boolean
-  const TP = useRef(null);  // tree pose boolean
-  const EF = useRef(null);  // elbows flared boolean
+  const AS = useRef(null); // arms straight boolean
+  const OAF = useRef(null); // on all fours boolean
+  const LH = useRef(null); // lower head boolean
+  const TP = useRef(null); // tree pose boolean
+  const EF = useRef(null); // elbows flared boolean
 
   const current_pose = useRef(null);
   const advice = useRef(null);
@@ -78,18 +79,7 @@ export default function WebcamTensorFlow() {
           TP.current = treePose(relative_pose, MIN_CONFIDENCE);
           EF.current = elbowsFlared(relative_pose, MIN_CONFIDENCE);
 
-          // if (HAH.current && KT.current && AS.current) {
-          //   current_pose.current = "chair";
-          // } else if (OAF.current && LH.current) {
-          //   current_pose.current = "dog";
-          // } else if (TP.current && !OAF.current && EF.current) {
-          //   current_pose.current = "tree";
-          // } else {
-          //   current_pose.current = "Freestyle Yoga Pose!";
-          // }
-
-          // use selection to swap out 'current_pose.current'
-          advice.current = printFeedback(static_pose, video, canvas, ctx, current_pose.current);
+          advice.current = printFeedback(static_pose, video, canvas, ctx, selectedPosition);
           setPose(relative_pose); // Update the pose state with the latest pose
           drawCanvas(static_pose, video, canvas, ctx);
         } else {
@@ -195,23 +185,47 @@ export default function WebcamTensorFlow() {
     }
   }
 
+  function handlePositionChange(event) {
+    setSelectedPosition(event.target.value);
+  }
+
   return (
     <div>
       <video ref={videoRef} style={{ display: "none" }} />
       <canvas ref={canvasRef} />
-      <div>
-        <h1>You are performing a {String(current_pose.current)}</h1>
-        <h2>{advice}</h2>
-        <h3>hands above head: {String(HAH.current)}</h3>
-        <h3>knees together: {String(KT.current)}</h3>
-        <h3>arms straight: {String(AS.current)}</h3>
-        <h3>on all fours: {String(OAF.current)}</h3>
-        <h3>lower head: {String(LH.current)}</h3>
-        <h3>tree pose: {String(TP.current)}</h3>
-        <h3>elbows flared: {String(EF.current)}</h3>
+      <div className="flex justify-center space-x-4 my-4">
+        <label className="flex items-center space-x-2">
+          <input
+            type="radio"
+            value="Chair"
+            checked={selectedPosition === "chair"}
+            onChange={handlePositionChange}
+            className="text-indigo-600 focus:ring-indigo-500 border-gray-300"
+          />
+          <span className="text-gray-700">Chair</span>
+        </label>
+        <label className="flex items-center space-x-2">
+          <input
+            type="radio"
+            value="Tree"
+            checked={selectedPosition === "tree"}
+            onChange={handlePositionChange}
+            className="text-green-600 focus:ring-green-500 border-gray-300"
+          />
+          <span className="text-gray-700">Tree</span>
+        </label>
+        <label className="flex items-center space-x-2">
+          <input
+            type="radio"
+            value="Dog"
+            checked={selectedPosition === "dog"}
+            onChange={handlePositionChange}
+            className="text-blue-600 focus:ring-blue-500 border-gray-300"
+          />
+          <span className="text-gray-700">Dog</span>
+        </label>
       </div>
-      <div>Current Time: {new Date().toLocaleString()}</div>
-      {pose && <PoseTable pose={pose} />}
+      {/* pose && <PoseTable pose={pose} /> */}
     </div>
   );
 }
