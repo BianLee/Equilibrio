@@ -17,7 +17,7 @@ Our chatbot feature also uses LLMs, specifically the Google Gemini API, to provi
 
 We also implemented a text-to-speech feature in our chat using ElevenLabs, so that users can hear their feedback live while they are doing their exercises, instead of having to input information on their device. 
 
-![Our tools and frameworks](https://i.imgur.com/915cUSg.png)
+![Our tools and frameworks](https://i.imgur.com/M2brQAi.png)
 
 
 ## Challenges we ran into
