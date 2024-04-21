@@ -123,7 +123,7 @@ export default function Landing() {
                   <br />
                   Experience the future of fitness—optimize your yoga and
                   pilates sessions at home or on-the-go with Equilibrio, where
-                  your progress is our priority.
+                  your progress is our priority
                 </p>
                 <div className="mt-10 flex items-center justify-center gap-x-6">
                   <Link href="/">
