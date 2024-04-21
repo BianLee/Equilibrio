@@ -2,8 +2,6 @@ import React from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
-
 function ImageSlider() {
   const settings = {
     dots: true,
@@ -19,19 +17,44 @@ function ImageSlider() {
     <div className="bg-white p-4 mt-4 rounded-lg shadow h-auto flex flex-col">
       <Slider {...settings}>
         <div>
-          <img src="/path/to/image1.jpg" alt="Image 1" />
+          <img
+            src="./cobra.jpg"
+            alt="Image 1"
+            style={{ userSelect: "none", pointerEvents: "none" }}
+            draggable="false"
+          />
         </div>
         <div>
-          <img src="/path/to/image2.jpg" alt="Image 2" />
+          <img
+            src="dog.jpg"
+            alt="Image 2"
+            style={{ userSelect: "none", pointerEvents: "none" }}
+            draggable="false"
+          />
         </div>
         <div>
-          <img src="/path/to/image3.jpg" alt="Image 3" />
+          <img
+            src="tree.jpg"
+            alt="Image 3"
+            style={{ userSelect: "none", pointerEvents: "none" }}
+            draggable="false"
+          />
         </div>
         <div>
-          <img src="/path/to/image4.jpg" alt="Image 4" />
+          <img
+            src="warrior.jpg"
+            alt="Image 4"
+            style={{ userSelect: "none", pointerEvents: "none" }}
+            draggable="false"
+          />
         </div>
         <div>
-          <img src="/path/to/image5.jpg" alt="Image 5" />
+          <img
+            src="chair.jpg"
+            alt="Image 5"
+            style={{ userSelect: "none", pointerEvents: "none" }}
+            draggable="false"
+          />
         </div>
       </Slider>
     </div>
