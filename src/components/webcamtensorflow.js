@@ -6,7 +6,7 @@ import {
   kneesTogether,
   armsStraight,
   onAllFours,
-  treePose
+  treePose,
 } from "./relativePosition.js";
 import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
@@ -22,9 +22,9 @@ export default function WebcamTensorFlow() {
 
   const HAH = useRef(null); // hands above head boolean
   const KT = useRef(null); // knees together boolean
-  const AS = useRef(null);  // arms straight boolean
-  const OAF = useRef(null);  // on all fours boolean
-  const TP = useRef(null);  // tree pose boolean
+  const AS = useRef(null); // arms straight boolean
+  const OAF = useRef(null); // on all fours boolean
+  const TP = useRef(null); // tree pose boolean
 
   useEffect(() => {
     async function setupCamera() {
