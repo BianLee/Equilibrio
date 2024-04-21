@@ -215,7 +215,7 @@ export default function Home() {
               </div>
             </div>
             <div className="w-1/2 px-2">
-              <div className="bg-white p-4 rounded-lg shadow h-full flex flex-col">
+              <div className="bg-white p-4 rounded-lg shadow h-auto flex flex-col">
                 <p>
                   Personal Coach: Gemini-powered AI coach with ElevenLabs
                   integration
