@@ -107,6 +107,25 @@ const onAllFours = ( pose_obj, minConfidence ) => {
     }
 }
 
+const lowerHead = ( pose_obj, minConfidence ) => {
+    const earsInFrame = pose_obj.keypoints[3].score > minConfidence && pose_obj.keypoints[4].score > minConfidence;
+    const shouldersInFrame = pose_obj.keypoints[5].score > minConfidence && pose_obj.keypoints[6].score > minConfidence;
+    if (!earsInFrame || !shouldersInFrame) {
+        return false;
+    }
+
+    const leftEarXY = pose_obj.keypoints[3].position;
+    const rightEarXY = pose_obj.keypoints[4].position;
+    const leftShoulderXY = pose_obj.keypoints[5].position;
+    const rightShoulderXY = pose_obj.keypoints[6].position;
+
+    if (rightEarXY.y < rightShoulderXY.y && leftEarXY.y < leftShoulderXY.y) {
+        return true;
+    } else {
+        false;
+    }
+}
+
 const treePose = ( pose_obj, minConfidence ) => {
     let anklesInFrame = (pose_obj.keypoints[15].score > minConfidence && pose_obj.keypoints[16].score > minConfidence);
     let kneesInFrame = (pose_obj.keypoints[13].score > minConfidence && pose_obj.keypoints[14].score > minConfidence);
@@ -131,8 +150,29 @@ const treePose = ( pose_obj, minConfidence ) => {
     }
 }
 
+const elbowsFlared = ( pose_obj, minConfidence ) => {
+    const elbowsInFrame = pose_obj.keypoints[7].score > minConfidence && pose_obj.keypoints[8].score > minConfidence;
+    if (!elbowsInFrame) {
+        return false;
+    }
+
+    const left_shoulder = pose_obj.keypoints[5].position;
+    const right_shoulder = pose_obj.keypoints[6].position;
+
+    const shoulder_dist = distance_formula(left_shoulder, right_shoulder);
+
+    const leftElbowXY = pose_obj.keypoints[7].position;
+    const rightElbowXY = pose_obj.keypoints[8].position;
+
+    if (Math.abs(leftElbowXY.x - rightElbowXY.x) > (shoulder_dist * 2)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 const distance_formula = (objA, objB) => {
     return ((objA.x - objB.x) ** 2 + (objA.y - objB.y) ** 2) ** 0.5;
 }
 
-export { centralizePoints, shoulderInFrame, handsAboveHead, kneesTogether, armsStraight, onAllFours, treePose };
+export { centralizePoints, shoulderInFrame, handsAboveHead, kneesTogether, armsStraight, onAllFours, lowerHead, treePose, elbowsFlared };

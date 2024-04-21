@@ -6,7 +6,9 @@ import {
   kneesTogether,
   armsStraight,
   onAllFours,
-  treePose
+  lowerHead,
+  treePose,
+  elbowsFlared
 } from "./relativePosition.js";
 import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
@@ -24,7 +26,11 @@ export default function WebcamTensorFlow() {
   const KT = useRef(null); // knees together boolean
   const AS = useRef(null);  // arms straight boolean
   const OAF = useRef(null);  // on all fours boolean
+  const LH = useRef(null);  // lower head boolean
   const TP = useRef(null);  // tree pose boolean
+  const EF = useRef(null);  // elbows flared boolean
+
+  const current_pose = useRef(null);
 
   useEffect(() => {
     async function setupCamera() {
@@ -67,7 +73,20 @@ export default function WebcamTensorFlow() {
           KT.current = kneesTogether(relative_pose, MIN_CONFIDENCE);
           AS.current = armsStraight(relative_pose, MIN_CONFIDENCE);
           OAF.current = onAllFours(relative_pose, MIN_CONFIDENCE);
+          LH.current = lowerHead(relative_pose, MIN_CONFIDENCE);
           TP.current = treePose(relative_pose, MIN_CONFIDENCE);
+          EF.current = elbowsFlared(relative_pose, MIN_CONFIDENCE);
+
+          if (HAH.current && KT.current && AS.current) {
+            current_pose.current = "chair";
+          } else if (OAF.current && LH.current) {
+            current_pose.current = "dog";
+          } else if (TP.current && !OAF.current && EF.current) {
+            current_pose.current = "tree";
+          } else {
+            current_pose.current = "Freestyle Yoga Pose!";
+          }
+          printFeedback(current_pose.current)
           setPose(relative_pose); // Update the pose state with the latest pose
           drawCanvas(static_pose, video, canvas, ctx);
         } else {
@@ -129,16 +148,44 @@ export default function WebcamTensorFlow() {
     });
   }
 
+  function printFeedback(pose) {
+    if (pose === 'chair') {
+      if (!HAH) {
+        return 'raise arms higher!';
+      } else if (!KT) {
+        return 'put your knees together!';
+      } else if (!AS) {
+        return 'straighten your arms!';
+      }
+    } else if (pose === 'dog') {
+      if (!OAF) {
+        return 'get on all fours!';
+      } else if (!HLS) {
+        return 'lower your head!';
+      }
+    } else if (pose === 'tree') {
+      if (!TP) {
+        return 'raise your leg up!';
+      } else if (!EF) {
+        return 'flare our elbows!';
+      }
+    }
+  }
+
   return (
     <div>
       <video ref={videoRef} style={{ display: "none" }} />
       <canvas ref={canvasRef} />
       <div>
+        <h1>You are performing a {String(current_pose.current)}</h1>
+        <h2>Try to {printFeedback(current_pose.current)}</h2>
         <h2>hands above head: {String(HAH.current)}</h2>
         <h2>knees together: {String(KT.current)}</h2>
         <h2>arms straight: {String(AS.current)}</h2>
         <h2>on all fours: {String(OAF.current)}</h2>
+        <h2>lower head: {String(LH.current)}</h2>
         <h2>tree pose: {String(TP.current)}</h2>
+        <h2>elbows flared: {String(EF.current)}</h2>
       </div>
       <div>Current Time: {new Date().toLocaleString()}</div>
       {pose && <PoseTable pose={pose} />}
