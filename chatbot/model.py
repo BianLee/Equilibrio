@@ -19,7 +19,7 @@ sample_text = ("Title: The next generation of AI for developers and Google Works
 
 
 MODEL = 'models/embedding-001'
-GOOGLE_API_KEY = "AIzaSyCwrMWy0zVAlVfQYgyRPmhkiTCZ_-ITQLM"
+GOOGLE_API_KEY = "" # !! insert
 
 genai.configure(api_key=GOOGLE_API_KEY)
 embedding = genai.embed_content(model=MODEL,
