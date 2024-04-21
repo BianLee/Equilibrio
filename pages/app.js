@@ -208,7 +208,7 @@ export default function Home() {
           <div className="flex -mx-2">
             <div className="w-1/2 px-2">
               <div className="bg-white p-4 rounded-lg shadow">
-                <p className="mt-2 text-gray-800 text-sm">Feedback:</p>
+                {/* <p className="mt-2 text-gray-800 text-sm">Feedback:</p> */}
                 <div className="flex mt-2 justify-center">
                   <WebcamTensorFlow />
                 </div>
