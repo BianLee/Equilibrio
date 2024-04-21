@@ -10,31 +10,24 @@ export default function WebcamTensorFlow() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [pose, setPose] = useState(null);
-  const [lastSnapshotTime, setLastSnapshotTime] = useState(Date.now());
+  const poseRef = useRef(null);  // Reference to hold the latest pose
 
   useEffect(() => {
     async function setupCamera() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error(
-          "Browser API navigator.mediaDevices.getUserMedia not available"
-        );
+        throw new Error("Browser API navigator.mediaDevices.getUserMedia not available");
       }
       const video = videoRef.current;
       video.width = 640;
       video.height = 480;
-      video.srcObject = await navigator.mediaDevices.getUserMedia({
-        video: true,
-      });
+      video.srcObject = await navigator.mediaDevices.getUserMedia({ video: true });
       return new Promise((resolve) => {
-        video.onloadedmetadata = () => {
-          resolve(video);
-        };
+        video.onloadedmetadata = () => resolve(video);
       });
     }
 
     async function loadPosenet() {
-      const net = await posenet.load();
-      return net;
+      return await posenet.load();
     }
 
     async function detectPoseInRealTime(video, net) {
@@ -44,48 +37,34 @@ export default function WebcamTensorFlow() {
       canvas.height = 480;
 
       async function poseDetectionFrame() {
-        const static_pose = await net.estimateSinglePose(video, {
-          flipHorizontal: false,
-        });
-
+        const static_pose = await net.estimateSinglePose(video, { flipHorizontal: false });
         if (shoulderInFrame(static_pose, MIN_CONFIDENCE)) {
-          const relative_pose = centralizePoints(
-            JSON.parse(JSON.stringify(static_pose))
-          );
-
+          const relative_pose = centralizePoints(JSON.parse(JSON.stringify(static_pose)));
           setPose(relative_pose);
+          poseRef.current = relative_pose;
+          // console.log('Updated Pose:', poseRef.current); // Log the updated pose
           drawCanvas(static_pose, video, canvas, ctx);
-
-          const currentTime = Date.now();
-          if (currentTime - lastSnapshotTime >= SNAPSHOT_INTERVAL) {
-            logPose(relative_pose);
-            setLastSnapshotTime(currentTime);
-          }
         } else {
           errorCanvas(video, canvas, ctx);
         }
-
         requestAnimationFrame(poseDetectionFrame);
       }
       poseDetectionFrame();
     }
 
-    setupCamera().then((video) => {
+    setupCamera().then(video => {
       video.play();
-      loadPosenet().then((net) => {
+      loadPosenet().then(net => {
         detectPoseInRealTime(video, net);
+        setInterval(() => {
+          if (poseRef.current) {
+            console.log('Periodic Pose Log:', new Date().toISOString(), poseRef.current);
+            localStorage.setItem('lastPose', JSON.stringify(poseRef.current)); // Store latest pose in local storage
+          }
+        }, SNAPSHOT_INTERVAL);
       });
     });
   }, []);
-
-  function logPose(pose) {
-    console.log(
-      "Snapshot at:",
-      new Date(lastSnapshotTime).toISOString(),
-      "Pose data:",
-      pose
-    );
-  }
 
   function drawCanvas(pose, video, canvas, ctx) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -109,7 +88,7 @@ export default function WebcamTensorFlow() {
   }
 
   function drawKeypoints(keypoints, ctx) {
-    keypoints.forEach((keypoint) => {
+    keypoints.forEach(keypoint => {
       if (keypoint.score >= MIN_CONFIDENCE) {
         const { y, x } = keypoint.position;
         ctx.beginPath();
@@ -124,7 +103,7 @@ export default function WebcamTensorFlow() {
     <div>
       <video ref={videoRef} style={{ display: "none" }} />
       <canvas ref={canvasRef} />
-      <div>Current Time:  {new Date(lastSnapshotTime).toLocaleString()}</div>
+      <div>Current Time: {new Date().toLocaleString()}</div>
       {pose && <PoseTable pose={pose} />}
     </div>
   );
