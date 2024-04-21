@@ -21,7 +21,8 @@ export default function WebcamTensorFlow() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [pose, setPose] = useState(null); // State to store the current pose
-  const [selectedPosition, setSelectedPosition] = useState("");
+  const selectedPosition = useRef("");
+  // const [selectedPosition, setSelectedPosition] = useState("");
 
   const HAH = useRef(null); // hands above head boolean
   const KT = useRef(null); // knees together boolean
@@ -78,10 +79,17 @@ export default function WebcamTensorFlow() {
           LH.current = lowerHead(relative_pose, MIN_CONFIDENCE);
           TP.current = treePose(relative_pose, MIN_CONFIDENCE);
           EF.current = elbowsFlared(relative_pose, MIN_CONFIDENCE);
+          console.log(HAH);
 
-          advice.current = printFeedback(static_pose, video, canvas, ctx, selectedPosition);
+          // 
+          // console.log(selectedPosition);  
+          advice.current = printFeedback(static_pose, video, canvas, ctx, selectedPosition.current);
           setPose(relative_pose); // Update the pose state with the latest pose
-          drawCanvas(static_pose, video, canvas, ctx);
+          if (advice.current === "Yes, good job!") {
+            successCanvas(static_pose, video, canvas, ctx);
+          } else {
+            drawCanvas(static_pose, video, canvas, ctx);
+          }
         } else {
           errorCanvas(video, canvas, ctx);
         }
@@ -134,8 +142,8 @@ export default function WebcamTensorFlow() {
     ctx.save();
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     drawKeypoints(pose.keypoints, ctx);
-    ctx.strokeStyle = "green";
-    ctx.lineWidth = 15;
+    ctx.strokeStyle = "lime";
+    ctx.lineWidth = 30;
     ctx.strokeRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
   }
@@ -154,39 +162,42 @@ export default function WebcamTensorFlow() {
 
   function printFeedback(pose_points, video, canvas, ctx, pose) {
     if (pose === 'chair') {
-      if (!HAH) {
+      if (!HAH.current) {
         return 'Try to raise arms higher!';
-      } else if (!KT) {
+      } else if (!KT.current) {
         return 'Try to put your knees together!';
-      } else if (!AS) {
+      } else if (!AS.current) {
         return 'Try to straighten your arms!';
       } else {
-        successCanvas(pose_points, video, canvas, ctx);
+        // successCanvas(pose_points, video, canvas, ctx);
         return 'Yes, good job!';
       }
     } else if (pose === 'dog') {
-      if (!OAF) {
+      if (!OAF.current) {
         return 'Try to get on all fours!';
-      } else if (!HLS) {
+      } else if (!HL.current) {
         return 'Try to lower your head!';
       } else {
-        successCanvas(pose_points, video, canvas, ctx);
+        // successCanvas(pose_points, video, canvas, ctx);
         return 'Yes, good job!';
       }
     } else if (pose === 'tree') {
-      if (!TP) {
+      if (!TP.current) {
         return 'Try to raise your leg up!';
-      } else if (!EF) {
+      } else if (!EF.current) {
         return 'Try to flare our elbows!';
       } else {
-        successCanvas(pose_points, video, canvas, ctx);
+        // successCanvas(pose_points, video, canvas, ctx);
         return 'Yes, good job!';
       }
+    } else {
+      return "Please select a pose.";
     }
   }
 
   function handlePositionChange(event) {
-    setSelectedPosition(event.target.value);
+    selectedPosition.current = event.target.value
+    // setSelectedPosition(event.target.value);
   }
 
   return (
@@ -198,7 +209,7 @@ export default function WebcamTensorFlow() {
           <input
             type="radio"
             value="chair"
-            checked={selectedPosition === "chair"}
+            checked={selectedPosition.current === "chair"}
             onChange={handlePositionChange}
             className="text-indigo-600 focus:ring-indigo-500 border-gray-300"
           />
@@ -208,7 +219,7 @@ export default function WebcamTensorFlow() {
           <input
             type="radio"
             value="tree"
-            checked={selectedPosition === "tree"}
+            checked={selectedPosition.current === "tree"}
             onChange={handlePositionChange}
             className="text-green-600 focus:ring-green-500 border-gray-300"
           />
@@ -218,7 +229,7 @@ export default function WebcamTensorFlow() {
           <input
             type="radio"
             value="dog"
-            checked={selectedPosition === "dog"}
+            checked={selectedPosition.current === "dog"}
             onChange={handlePositionChange}
             className="text-blue-600 focus:ring-blue-500 border-gray-300"
           />
