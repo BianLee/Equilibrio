@@ -54,7 +54,7 @@ def detect(input_tensor, inference_count=3):
 
     return person
 
-ypt_dir = Path("./training/yoga_poses/train/chair")
+ypt_dir = Path("./training/yoga_poses/train/warrior")
 all_poses = dict()
 
 for yoga_pose in ypt_dir.iterdir():
@@ -63,15 +63,23 @@ for yoga_pose in ypt_dir.iterdir():
 
     person = detect(image)
     person_coords = dict()
-    for keypoint in person.keypoints:
-        person_coords[keypoint.body_part.name] = dict()
-        person_coords[keypoint.body_part.name]["coordinates"] = dict()
-        person_coords[keypoint.body_part.name]["coordinates"]["x"] = str(keypoint.coordinate.x)
-        person_coords[keypoint.body_part.name]["coordinates"]["y"] = str(keypoint.coordinate.y)
-        person_coords[keypoint.body_part.name]["score"] = str(keypoint.score)
 
-    all_poses[yoga_pose.name] = person_coords
+    nose_x, nose_y = person.keypoints[0].coordinate
+    lsx, lsy = person.keypoints[5].coordinate
+    # print(lsx, lsy)
+    rsx, rsy = person.keypoints[6].coordinate
+    # print(rsx, rsy)
+    shoulder_width = ((lsx - rsx) ** 2 + (lsy - rsy) ** 2) ** 0.5
+    if (shoulder_width):
+        for keypoint in person.keypoints:
+            person_coords[keypoint.body_part.name] = dict()
+            person_coords[keypoint.body_part.name]["coordinates"] = dict()
+            person_coords[keypoint.body_part.name]["coordinates"]["x"] = (keypoint.coordinate.x - nose_x) / shoulder_width
+            person_coords[keypoint.body_part.name]["coordinates"]["y"] = (nose_y - keypoint.coordinate.y) / shoulder_width
+            person_coords[keypoint.body_part.name]["score"] = keypoint.score
 
-print(all_poses)
+        all_poses[yoga_pose.name] = person_coords
+    
+
 write_file = Path("./training/pose_data.txt").open('w')
-write_file.write(str(json.dumps(all_poses)))
+write_file.write(str(json.dumps(repr(all_poses))))
