@@ -194,9 +194,7 @@ export default function Home() {
         */}
         <nav className="relative flex items-center justify-center py-4">
           <Link href="/">
-            <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400">
-              equilibr.io
-            </h1>
+            <h1 className="text-5xl font-bold bg-clip-text">Equilibrio</h1>
           </Link>
           <button
             className="absolute right-4 bg-gray-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"

@@ -253,12 +253,12 @@ export default function Landing() {
               <div className="hidden sm:mb-8 sm:flex sm:justify-center"></div>
               <div className="text-center">
                 <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-                  Equilibr.io
+                  Equilibrio
                 </h1>
                 <p className="mt-6 text-lg leading-8 text-gray-300">
-                  A smart web app that offers real-time yoga and pilates form correction
-                  and live, personalized coaching. Equilibrio ensures you perform every pose 
-                  safely and effectively.
+                  A smart web app that offers real-time yoga and pilates form
+                  correction and live, personalized coaching. Equilibrio ensures
+                  you perform every pose safely and effectively.
                 </p>
                 <div className="mt-10 flex items-center justify-center gap-x-6">
                   <a
