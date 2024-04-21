@@ -41,22 +41,7 @@ export default function Home() {
     };
 
     const safetySettings = [
-      {
-        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
-      {
-        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-        threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-      },
+      // Existing safety settings
     ];
 
     const chat = model.startChat({
@@ -66,10 +51,18 @@ export default function Home() {
     });
 
     const result = await chat.sendMessage(input + instructions);
-    const response = result.response;
-    console.log(response.text());
-    setResponseData(response.text());
-    setInput("");
+    const response = result.response.text();
+
+    console.log(response);
+    if (response) {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: input, sender: "user" },
+        { text: response, sender: "gemini" },
+      ]);
+      setResponseData(response);
+      setInput("");
+    }
   }
 
   useInitializeAuth();
@@ -94,7 +87,7 @@ export default function Home() {
     const API_KEY = "6ec6a451d2ee80120d295ed14bd80e10";
     // Set the ID of the voice to be used.
     const VOICE_ID = "5BtoxJWuomqxGLNvKwal";
-    setMessages((prevMessages) => [...prevMessages, message]);
+
     setMessage(""); // Clear the input after sending
     // Set options for the API request.
     const options = {
@@ -219,19 +212,26 @@ export default function Home() {
               <div className="bg-white p-4 rounded-lg shadow h-full flex flex-col">
                 <div className="flex-1 overflow-y-auto">
                   {messages.map((msg, index) => (
-                    <div key={index} className="p-2 m-2 bg-blue-100 rounded">
-                      {msg}
+                    <div
+                      key={index}
+                      className={`p-2 m-2 rounded ${
+                        msg.sender === "user" ? "bg-blue-100" : "bg-gray-100"
+                      }`}
+                    >
+                      {msg.text}
                     </div>
                   ))}
                 </div>
-                <div>{responseData}</div>
                 <div className="mt-4">
                   <input
                     type="text"
                     placeholder="Type your message here..."
                     className="w-full p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                     value={message}
-                    onChange={handleInputChange}
+                    onChange={(e) => {
+                      setInput(e.target.value);
+                      setMessage(e.target.value);
+                    }}
                   />
                 </div>
                 <button
