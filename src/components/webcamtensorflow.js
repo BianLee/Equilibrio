@@ -5,6 +5,8 @@ import {
   handsAboveHead,
   kneesTogether,
   armsStraight,
+  onAllFours,
+  treePose
 } from "./relativePosition.js";
 import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
@@ -20,7 +22,9 @@ export default function WebcamTensorFlow() {
 
   const HAH = useRef(null); // hands above head boolean
   const KT = useRef(null); // knees together boolean
-  const AS = useRef(null);
+  const AS = useRef(null);  // arms straight boolean
+  const OAF = useRef(null);  // on all fours boolean
+  const TP = useRef(null);  // tree pose boolean
 
   useEffect(() => {
     async function setupCamera() {
@@ -62,6 +66,8 @@ export default function WebcamTensorFlow() {
           HAH.current = handsAboveHead(relative_pose, MIN_CONFIDENCE);
           KT.current = kneesTogether(relative_pose, MIN_CONFIDENCE);
           AS.current = armsStraight(relative_pose, MIN_CONFIDENCE);
+          OAF.current = onAllFours(relative_pose, MIN_CONFIDENCE);
+          TP.current = treePose(relative_pose, MIN_CONFIDENCE);
           setPose(relative_pose); // Update the pose state with the latest pose
           drawCanvas(static_pose, video, canvas, ctx);
         } else {
@@ -131,6 +137,8 @@ export default function WebcamTensorFlow() {
         <h2>hands above head: {String(HAH.current)}</h2>
         <h2>knees together: {String(KT.current)}</h2>
         <h2>arms straight: {String(AS.current)}</h2>
+        <h2>on all fours: {String(OAF.current)}</h2>
+        <h2>tree pose: {String(TP.current)}</h2>
       </div>
       <div>Current Time: {new Date().toLocaleString()}</div>
       {pose && <PoseTable pose={pose} />}

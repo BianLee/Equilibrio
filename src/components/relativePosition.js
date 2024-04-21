@@ -1,13 +1,13 @@
+import { min } from "@tensorflow/tfjs";
+
 const centralizePoints = ( pose_obj ) => {
     const nose_y = pose_obj.keypoints[0].position.y;
     const nose_x = pose_obj.keypoints[0].position.x;
 
     const left_shoulder = pose_obj.keypoints[5].position;
-    const lsx = left_shoulder.x; const lsy = left_shoulder.y;
     const right_shoulder = pose_obj.keypoints[6].position;
-    const rsx = right_shoulder.x; const rsy = right_shoulder.y;
 
-    const shoulder_dist = ((lsx - rsx) ** 2 + (lsy - rsy) ** 2) ** 0.5;
+    const shoulder_dist = distance_formula(left_shoulder, right_shoulder);
 
     for (let body_i = 0; body_i < Object.keys(pose_obj["keypoints"]).length; body_i++) {
         pose_obj.keypoints[body_i].position.y = (nose_y - pose_obj.keypoints[body_i].position.y) / shoulder_dist;
@@ -46,16 +46,14 @@ const kneesTogether = ( pose_obj, minConfidence ) => {
     }
 
     const left_shoulder = pose_obj.keypoints[5].position;
-    const lsx = left_shoulder.x; const lsy = left_shoulder.y;
     const right_shoulder = pose_obj.keypoints[6].position;
-    const rsx = right_shoulder.x; const rsy = right_shoulder.y;
 
-    const shoulder_dist = ((lsx - rsx) ** 2 + (lsy - rsy) ** 2) ** 0.5;
+    const shoulder_dist = distance_formula(left_shoulder, right_shoulder);
 
     let leftKneeXY = pose_obj.keypoints[13].position;
     let rightKneeXY = pose_obj.keypoints[14].position;
 
-    if (Math.abs(leftKneeXY.x - rightKneeXY.x) < (shoulder_dist/1.5)) {
+    if (Math.abs(leftKneeXY.x - rightKneeXY.x) < (shoulder_dist)) {
         return true;
     } else {
         return false;
@@ -69,21 +67,72 @@ const armsStraight = ( pose_obj, minConfidence ) => {
     }
 
     const left_shoulder = pose_obj.keypoints[5].position;
-    const lsx = left_shoulder.x; const lsy = left_shoulder.y;
     const right_shoulder = pose_obj.keypoints[6].position;
-    const rsx = right_shoulder.x; const rsy = right_shoulder.y;
 
-    const shoulder_dist = ((lsx - rsx) ** 2 + (lsy - rsy) ** 2) ** 0.5;
+    const shoulder_dist = distance_formula(left_shoulder, right_shoulder);
 
     let leftElbowXY = pose_obj.keypoints[7].position;
     let rightElbowXY = pose_obj.keypoints[8].position;
 
-    if (Math.abs(rightElbowXY.x - rsx) < (shoulder_dist/2) && Math.abs(leftElbowXY.x - lsx) < (shoulder_dist/2) && 
-        Math.abs(rightElbowXY.y - rsy) > (shoulder_dist/2) && Math.abs(leftElbowXY.y - lsy) > (shoulder_dist/2)) {
+    if (Math.abs(rightElbowXY.x - right_shoulder.x) < (shoulder_dist/2) && Math.abs(leftElbowXY.x - left_shoulder.x) < (shoulder_dist/2) && 
+        Math.abs(rightElbowXY.y - right_shoulder.y) > (shoulder_dist/2) && Math.abs(leftElbowXY.y - left_shoulder.y) > (shoulder_dist/2)) {
         return true;
     } else {
         return false;
     }
 }
 
-export { centralizePoints, shoulderInFrame, handsAboveHead, kneesTogether, armsStraight };
+const onAllFours = ( pose_obj, minConfidence ) => {
+    let wristsInFrame = (pose_obj.keypoints[9].score > minConfidence && pose_obj.keypoints[10].score > minConfidence);
+    let anklesInFrame = (pose_obj.keypoints[15].score > minConfidence && pose_obj.keypoints[16].score > minConfidence);
+    
+    if (!wristsInFrame || !anklesInFrame) {
+        return false;
+    }
+
+    const left_shoulder = pose_obj.keypoints[5].position;
+    const right_shoulder = pose_obj.keypoints[6].position;
+
+    const shoulder_dist = distance_formula(left_shoulder, right_shoulder);
+
+    let leftWristXY = pose_obj.keypoints[9].position;
+    let rightWristXY = pose_obj.keypoints[10].position;
+    let leftAnkleXY = pose_obj.keypoints[15].position;
+    let rightAnkleXY = pose_obj.keypoints[16].position;
+
+    if (Math.abs(leftWristXY.y - leftAnkleXY.y) < shoulder_dist && Math.abs(rightWristXY.y - rightAnkleXY.y) < shoulder_dist) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+const treePose = ( pose_obj, minConfidence ) => {
+    let anklesInFrame = (pose_obj.keypoints[15].score > minConfidence && pose_obj.keypoints[16].score > minConfidence);
+    let kneesInFrame = (pose_obj.keypoints[13].score > minConfidence && pose_obj.keypoints[14].score > minConfidence);
+    if (!anklesInFrame || !kneesInFrame) {
+        return false;
+    }
+
+    const left_shoulder = pose_obj.keypoints[5].position;
+    const right_shoulder = pose_obj.keypoints[6].position;
+
+    const shoulder_dist = distance_formula(left_shoulder, right_shoulder);
+
+    let leftKneeXY = pose_obj.keypoints[13].position;
+    let rightKneeXY = pose_obj.keypoints[14].position;
+    let leftAnkleXY = pose_obj.keypoints[15].position;
+    let rightAnkleXY = pose_obj.keypoints[16].position;
+
+    if (distance_formula(leftKneeXY, rightAnkleXY) < shoulder_dist || distance_formula(rightKneeXY, leftAnkleXY) < shoulder_dist) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+const distance_formula = (objA, objB) => {
+    return ((objA.x - objB.x) ** 2 + (objA.y - objB.y) ** 2) ** 0.5;
+}
+
+export { centralizePoints, shoulderInFrame, handsAboveHead, kneesTogether, armsStraight, onAllFours, treePose };
