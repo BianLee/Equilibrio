@@ -124,7 +124,7 @@ export default function WebcamTensorFlow() {
     <div>
       <video ref={videoRef} style={{ display: "none" }} />
       <canvas ref={canvasRef} />
-      <div>Current Time: {new Date(lastSnapshotTime).toLocaleString()}</div>
+      <div>Current Time:  {new Date(lastSnapshotTime).toLocaleString()}</div>
       {pose && <PoseTable pose={pose} />}
     </div>
   );
