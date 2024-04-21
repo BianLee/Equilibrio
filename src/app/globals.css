@@ -22,3 +22,13 @@
     transform: rotate(360deg);
   }
 }
+
+.slick-slide img {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.slick-dots {
+  bottom: -30px;
+}
