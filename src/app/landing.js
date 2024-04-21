@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Dialog, Disclosure } from "@headlessui/react";
+import Link from 'next/link'; // Import Link from next/link
 import {
   Bars3Icon,
   MinusSmallIcon,
@@ -158,22 +159,17 @@ export default function Landing() {
           </div>
           <div className="hidden lg:flex lg:gap-x-12">
             {navigation.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="text-sm font-semibold leading-6 text-white"
-              >
-                {item.name}
-              </a>
+              <Link key={item.name} href={item.href}>
+                <p className="text-sm font-semibold leading-6 text-white">{item.name}</p>
+              </Link>
             ))}
           </div>
           <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-            <a
-              href="/signin"
-              className="text-sm font-semibold leading-6 text-white"
-            >
-              Log in <span aria-hidden="true">&rarr;</span>
-            </a>
+            <Link href="/signin">
+              <p className="text-sm font-semibold leading-6 text-white">
+                Log in <span aria-hidden="true">&rarr;</span>
+              </p>
+            </Link>
           </div>
         </nav>
         <Dialog
@@ -206,22 +202,19 @@ export default function Landing() {
               <div className="-my-6 divide-y divide-gray-500/10">
                 <div className="space-y-2 py-6">
                   {navigation.map((item) => (
-                    <a
-                      key={item.name}
-                      href={item.href}
-                      className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                    >
-                      {item.name}
-                    </a>
+                    <Link key={item.name} href={item.href}>
+                      <p className="-mx-3 block rounded-lg px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                        {item.name}
+                      </p>
+                    </Link>
                   ))}
                 </div>
                 <div className="py-6">
-                  <a
-                    href="#"
-                    className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                  >
-                    Log in
-                  </a>
+                  <Link href="/signin">
+                    <p className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                      Log in
+                    </p>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -261,12 +254,11 @@ export default function Landing() {
                   you perform every pose safely and effectively.
                 </p>
                 <div className="mt-10 flex items-center justify-center gap-x-6">
-                  <a
-                    href="/app"
-                    className="rounded-md bg-blue-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-200"
-                  >
-                    Get started
-                  </a>
+                  <Link href="/app">
+                    <p className="rounded-md bg-blue-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-200">
+                      Get started
+                    </p>
+                  </Link>
                 </div>
               </div>
             </div>
