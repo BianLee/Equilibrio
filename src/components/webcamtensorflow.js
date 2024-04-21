@@ -25,6 +25,7 @@ export default function WebcamTensorFlow() {
   const AS = useRef(null); // arms straight boolean
   const OAF = useRef(null); // on all fours boolean
   const TP = useRef(null); // tree pose boolean
+  const [selectedPosition, setSelectedPosition] = useState("");
 
   useEffect(() => {
     async function setupCamera() {
@@ -129,10 +130,47 @@ export default function WebcamTensorFlow() {
     });
   }
 
+  function handlePositionChange(event) {
+    setSelectedPosition(event.target.value);
+  }
+
   return (
     <div>
       <video ref={videoRef} style={{ display: "none" }} />
       <canvas ref={canvasRef} />
+      <div className="flex justify-center space-x-4 my-4">
+        <label className="flex items-center space-x-2">
+          <input
+            type="radio"
+            value="Chair"
+            checked={selectedPosition === "Chair"}
+            onChange={handlePositionChange}
+            className="text-indigo-600 focus:ring-indigo-500 border-gray-300"
+          />
+          <span className="text-gray-700">Chair</span>
+        </label>
+        <label className="flex items-center space-x-2">
+          <input
+            type="radio"
+            value="Tree"
+            checked={selectedPosition === "Tree"}
+            onChange={handlePositionChange}
+            className="text-green-600 focus:ring-green-500 border-gray-300"
+          />
+          <span className="text-gray-700">Tree</span>
+        </label>
+        <label className="flex items-center space-x-2">
+          <input
+            type="radio"
+            value="Dog"
+            checked={selectedPosition === "Dog"}
+            onChange={handlePositionChange}
+            className="text-blue-600 focus:ring-blue-500 border-gray-300"
+          />
+          <span className="text-gray-700">Dog</span>
+        </label>
+      </div>
+
       <div>
         <h2>hands above head: {String(HAH.current)}</h2>
         <h2>knees together: {String(KT.current)}</h2>
