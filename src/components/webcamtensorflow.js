@@ -9,17 +9,11 @@ const SNAPSHOT_INTERVAL = 10000; // milliseconds (10 seconds)
 export default function WebcamTensorFlow() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-<<<<<<< HEAD
   const [pose, setPose] = useState(null); // State to store the current pose
-  const false_var = false;
 
   const HAH = useRef(null);  // hands above head boolean
   const KT = useRef(null);  // knees together boolean
   const AS = useRef(null);
-=======
-  const [pose, setPose] = useState(null);
-  const poseRef = useRef(null);  // Reference to hold the latest pose
->>>>>>> origin/master
 
   useEffect(() => {
     async function setupCamera() {
@@ -114,15 +108,12 @@ export default function WebcamTensorFlow() {
     <div>
       <video ref={videoRef} style={{ display: "none" }} />
       <canvas ref={canvasRef} />
-<<<<<<< HEAD
       <div>
         <h2>hands above head: {String(HAH.current)}</h2>
         <h2>knees together: {String(KT.current)}</h2>
         <h2>arms straight: {String(AS.current)}</h2>
       </div>
-=======
       <div>Current Time: {new Date().toLocaleString()}</div>
->>>>>>> origin/master
       {pose && <PoseTable pose={pose} />}
     </div>
   );
