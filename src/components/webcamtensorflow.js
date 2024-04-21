@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { centralizePoints, shoulderInFrame } from "./relativePosition.js";
+import { centralizePoints, shoulderInFrame, handsAboveHead, kneesTogether, armsStraight } from "./relativePosition.js";
 import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
 
@@ -11,6 +11,11 @@ export default function WebcamTensorFlow() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [pose, setPose] = useState(null); // State to store the current pose
+  const false_var = false;
+
+  const HAH = useRef(null);  // hands above head boolean
+  const KT = useRef(null);  // knees together boolean
+  const AS = useRef(null);
 
   useEffect(() => {
     async function setupCamera() {
@@ -51,6 +56,10 @@ export default function WebcamTensorFlow() {
         
         if (shoulderInFrame(static_pose, MIN_CONFIDENCE)) {
           const relative_pose = centralizePoints(JSON.parse(JSON.stringify(static_pose)));  // deep copies the static_pose and makes coordinates relative
+          // export relative position data from live feed here
+          HAH.current = handsAboveHead(relative_pose, MIN_CONFIDENCE);
+          KT.current = kneesTogether(relative_pose, MIN_CONFIDENCE);
+          AS.current = armsStraight(relative_pose, MIN_CONFIDENCE);
           setPose(relative_pose); // Update the pose state with the latest pose
           drawCanvas(static_pose, video, canvas, ctx);
           
@@ -108,6 +117,11 @@ export default function WebcamTensorFlow() {
     <div>
       <video ref={videoRef} style={{ display: "none" }} />
       <canvas ref={canvasRef} />
+      <div>
+        <h2>hands above head: {String(HAH.current)}</h2>
+        <h2>knees together: {String(KT.current)}</h2>
+        <h2>arms straight: {String(AS.current)}</h2>
+      </div>
       {pose && <PoseTable pose={pose} />}
     </div>
   );
