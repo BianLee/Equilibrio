@@ -81,6 +81,7 @@ export default function Home() {
   const [audioUrl, setAudioUrl] = useState("");
 
   const handleAudioGeneration = async (message) => {
+    if (!message) return;
     runChat();
     // Set the API key for ElevenLabs API.
     // Do not use directly. Use environment variables.
@@ -113,6 +114,13 @@ export default function Home() {
       console.error("Error generating audio:", error);
     }
   };
+
+  useEffect(() => {
+    if (message.trim()) {
+      // Check if the message is not just empty or spaces
+      handleAudioGeneration(message);
+    }
+  }, []);
 
   const handleInputChange = (event) => {
     setInput(event.target.value);
