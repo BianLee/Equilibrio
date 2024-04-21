@@ -226,6 +226,9 @@ export default function WebcamTensorFlow() {
         </label>
       </div>
       {/* pose && <PoseTable pose={pose} /> */}
+      <div>
+        <h3>Coach: {advice.current}</h3>
+      </div>
     </div>
   );
 }
